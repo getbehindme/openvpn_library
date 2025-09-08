@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.text.TextUtils;
 
 import java.util.HashSet;
@@ -134,18 +135,20 @@ public class OrbotHelper {
      * method returns.
      *
      * @param cb a callback
-     * @return the singleton, for chaining
      */
-    public synchronized OrbotHelper addStatusCallback(Context c, StatusCallback cb) {
-        if (statusCallbacks.size() == 0) {
-            c.getApplicationContext().registerReceiver(orbotStatusReceiver,
-                    new IntentFilter(OrbotHelper.ACTION_STATUS));
+    public synchronized void addStatusCallback(Context c, StatusCallback cb) {
+        if (statusCallbacks.isEmpty()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    c.getApplicationContext().registerReceiver(orbotStatusReceiver,
+                            new IntentFilter(OrbotHelper.ACTION_STATUS), Context.RECEIVER_NOT_EXPORTED);
+                }
+            }
             mContext = c.getApplicationContext();
         }
         if (!checkTorReceier(c))
             cb.onNotYetInstalled();
         statusCallbacks.add(cb);
-        return (this);
     }
 
     /**
