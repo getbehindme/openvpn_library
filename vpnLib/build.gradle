@@ -40,10 +40,7 @@ android {
     }
 
     publishing {
-        multipleVariants {
-            includeBuildTypeValues("debug", "release", "profile")
-            withSourcesJar()
-        }
+        singleVariant("release") { withSourcesJar() }
     }
 }
 
@@ -57,16 +54,16 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }
 
-// Publish AARs to a local maven setup
 afterEvaluate {
     publishing {
         publications {
-            maven(MavenPublication) {
-                from components.default
-                groupId = project.group
+            release(MavenPublication) {
+                from components.release
+                groupId    = project.group
                 artifactId = "openvpn_library"
                 version = project.version
             }
         }
     }
 }
+
